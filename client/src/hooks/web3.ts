@@ -39,7 +39,7 @@ const Hooks = (): state => {
   }, []);
 
   const { isLoading, isWeb3, web3, accounts } = state;
-  
+
   return { isLoading, isWeb3, web3, accounts };
 };
 

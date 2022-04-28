@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import './css/App.css';
+import './App.css';
 import { Contract } from 'web3-eth-contract';
-import json from './contracts/SimpleStorage.json';
+import { AbiItem } from 'web3-utils'
+import json from './contracts/LubyGame.json';
 import useWeb3 from './hooks/web3';
 
-const App: React.VFC = () => {
+const App: React.FC = () => {
   const { isLoading, isWeb3, web3, accounts } = useWeb3();
   const [instance, setInstance] = useState<Contract>();
   const [value, setValue] = useState('');
@@ -14,10 +15,9 @@ const App: React.VFC = () => {
   useEffect(() => {
     (async() => {
       if(web3 !== null) {
-        // const networkId = await web3.eth.net.getId();
-        const deployedNetwork = json.networks[3];
+        const deployedNetwork = json.networks["5777"];
         const instance = new web3.eth.Contract(
-          abi,
+          abi as AbiItem[],
           deployedNetwork && deployedNetwork.address
         );
         setInstance(instance);

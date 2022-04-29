@@ -3,9 +3,9 @@ import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils'
 import json from '../../contracts/LubyGame.json';
 import useWeb3 from '../../hooks/web3';
-import { Button } from '../../shared/Button';
+import { Button, ButtonContainer } from '../../shared/Button';
 import Game from '../game/game';
-import { Container, Options } from './styles';
+import { Container, Options, OptionsContainer } from './styles';
 
 const Menu = () => {
     const { isLoading, isWeb3, web3, accounts } = useWeb3();
@@ -33,16 +33,30 @@ const Menu = () => {
         <Container>
             {isLoading ? <div>Loading Web3, accounts, and contract...</div>
                 : isWeb3 ? (game ?
-                    <Options>
-                        <Game />
-                        <Button onClick={() => setGame(false)}>voltar</Button>
-                    </Options>
+                    <>
+                        <OptionsContainer>
+                            <Options>
+                                <Game />
+                                <ButtonContainer>
+                                    <Button>apostar</Button>
+                                    <Button onClick={() => setGame(false)}>voltar</Button>
+                                </ButtonContainer>
+                            </Options>
+                        </OptionsContainer>
+                    </>
                     :
-                    <Options>
-                        <h1>Luby Game</h1>
-                        <Button onClick={() => setGame(true)}>start</Button>
-                        <Button onClick={handleDonate}>donate</Button>
-                    </Options>)
+                    <>
+                        <OptionsContainer>
+                            <h1>Luby Game</h1>
+                            <Options>
+                                <p>Bem vindo ao Luby Game. Assim que você clicar em "start" poderá começar as apostas</p>
+                                <ButtonContainer>
+                                    <Button onClick={() => setGame(true)}>start</Button>
+                                    <Button onClick={handleDonate}>donate</Button>
+                                </ButtonContainer>
+                            </Options>
+                        </OptionsContainer>
+                    </>)
                     : <div>
                         <p>none web3</p>
                     </div>

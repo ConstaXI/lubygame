@@ -11,6 +11,7 @@ const Menu = () => {
     const { isLoading, isWeb3, web3, accounts } = useWeb3();
     const [instance, setInstance] = useState<Contract>();
     const [game, setGame] = useState(false)
+    const [amount, setAmount] = useState(0)
 
     const abi = json.abi;
 
@@ -29,6 +30,17 @@ const Menu = () => {
         await instance?.methods.mintLbc("1000000000000000000").send({ from: accounts[0] })
     }
 
+    const handleStart = async () => {
+        setGame(true)
+
+        await instance?.methods.approve("1000000000000000000").send({ from: accounts[0] })
+        await instance?.methods.startGame("1000000000000000000").send({ from: accounts[0] })
+
+        const individualBalance = await instance?.methods.getBalanceIndividual().call({ from: accounts[0] })
+
+        setAmount(individualBalance)
+    }
+
     return (
         <Container>
             {isLoading ? <div>Loading Web3, accounts, and contract...</div>
@@ -42,6 +54,7 @@ const Menu = () => {
                                     <Button onClick={() => setGame(false)}>voltar</Button>
                                 </ButtonContainer>
                             </Options>
+                            <strong>{amount}</strong>
                         </OptionsContainer>
                     </>
                     :
@@ -51,7 +64,7 @@ const Menu = () => {
                             <Options>
                                 <p>Bem vindo ao Luby Game. Assim que você clicar em "start" poderá começar as apostas</p>
                                 <ButtonContainer>
-                                    <Button onClick={() => setGame(true)}>start</Button>
+                                    <Button onClick={handleStart}>start</Button>
                                     <Button onClick={handleDonate}>donate</Button>
                                 </ButtonContainer>
                             </Options>

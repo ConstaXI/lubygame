@@ -12,39 +12,35 @@ const App = () => {
   const abi = json.abi;
 
   useEffect(() => {
-    if(web3 !== null) {
-      const deployedNetwork = json.networks["5777"];
-      const instance = new web3.eth.Contract(
-        abi as AbiItem[],
-        deployedNetwork && deployedNetwork.address
-      );
-      setInstance(instance);
-    }
-  }, [abi, isLoading, isWeb3, web3]);
+    (async () => {
+      if (web3 !== null) {
+        const deployedNetwork = json.networks["5777"];
+        const instance = new web3.eth.Contract(
+          abi as AbiItem[],
+          deployedNetwork && deployedNetwork.address
+        );
+        setInstance(instance);
+      }
+    })()
+  }, [abi, accounts, isLoading, isWeb3, web3]);
+
+  const handleDonate = async () => {
+    await instance?.methods.mintLbc("1000000000000000000").send({ from: accounts[0] })
+  }
 
   return (
     <div className="App">
-      { isLoading ? <div>Loading Web3, accounts, and contract...</div>
-      : isWeb3 ? 
-        <>
-          <h1>Good to Go!</h1>
-          <p>Your Truffle Box is installed and ready.</p>
-          <h2>Smart Contract Example</h2>
-          <p>
-            If your contracts compiled and migrated successfully, below will show
-            a stored value of "hello World" (by default).
-          </p>
-          <p>
-            Try changing the value stored on <strong>line 63</strong> of App.ts.
-          </p>
-          <div>The stored value is: value</div>
-
-          <p>Click here to run the contract↓</p>
-          <button>click</button>
-        </>
-        : <div>
-          <p>none web3</p>
-        </div>
+      {isLoading ? <div>Loading Web3, accounts, and contract...</div>
+        : isWeb3 ?
+          <div>
+            <h1>Luby Game</h1>
+            <button>start</button>
+            <button onClick={handleDonate}>donate</button>
+            <p>aaa</p>
+          </div>
+          : <div>
+            <p>none web3</p>
+          </div>
       }
     </div>
   );

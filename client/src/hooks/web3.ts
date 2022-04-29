@@ -21,7 +21,7 @@ const Hooks = (): state => {
     (async(): Promise<void> => {
       try {
         const web3: Web3 = await getWeb3();
-        const accounts = await web3.eth.getAccounts();
+        const accounts = await web3.eth.requestAccounts();
         setState({
           ...state,
           isLoading: false,

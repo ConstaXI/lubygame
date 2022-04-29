@@ -1,35 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils'
 import json from './contracts/LubyGame.json';
 import useWeb3 from './hooks/web3';
 
-const App: React.FC = () => {
+const App = () => {
   const { isLoading, isWeb3, web3, accounts } = useWeb3();
   const [instance, setInstance] = useState<Contract>();
-  const [value, setValue] = useState('');
 
   const abi = json.abi;
 
   useEffect(() => {
-    (async() => {
-      if(web3 !== null) {
-        const deployedNetwork = json.networks["5777"];
-        const instance = new web3.eth.Contract(
-          abi as AbiItem[],
-          deployedNetwork && deployedNetwork.address
-        );
-        setInstance(instance);
-      }
-    })();
+    if(web3 !== null) {
+      const deployedNetwork = json.networks["5777"];
+      const instance = new web3.eth.Contract(
+        abi as AbiItem[],
+        deployedNetwork && deployedNetwork.address
+      );
+      setInstance(instance);
+    }
   }, [abi, isLoading, isWeb3, web3]);
-
-  const runExample = async() => {
-    await instance?.methods.set('hello World').send({ from: accounts[0]});
-    const response = await instance?.methods.get().call();
-    setValue(response);
-  }
 
   return (
     <div className="App">
@@ -46,10 +37,10 @@ const App: React.FC = () => {
           <p>
             Try changing the value stored on <strong>line 63</strong> of App.ts.
           </p>
-          <div>The stored value is: {value}</div>
+          <div>The stored value is: value</div>
 
           <p>Click here to run the contract↓</p>
-          <button onClick={runExample} >click</button>
+          <button>click</button>
         </>
         : <div>
           <p>none web3</p>

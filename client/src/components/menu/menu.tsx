@@ -3,11 +3,14 @@ import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils'
 import json from '../../contracts/LubyGame.json';
 import useWeb3 from '../../hooks/web3';
-import { Container, Options, Button } from './styles';
+import { Button } from '../../shared/Button';
+import Game from '../game/game';
+import { Container, Options } from './styles';
 
 const Menu = () => {
     const { isLoading, isWeb3, web3, accounts } = useWeb3();
     const [instance, setInstance] = useState<Contract>();
+    const [game, setGame] = useState(false)
 
     const abi = json.abi;
 
@@ -29,12 +32,17 @@ const Menu = () => {
     return (
         <Container>
             {isLoading ? <div>Loading Web3, accounts, and contract...</div>
-                : isWeb3 ?
+                : isWeb3 ? (game ?
+                    <Options>
+                        <Game />
+                        <Button onClick={() => setGame(false)}>voltar</Button>
+                    </Options>
+                    :
                     <Options>
                         <h1>Luby Game</h1>
-                        <Button>start</Button>
+                        <Button onClick={() => setGame(true)}>start</Button>
                         <Button onClick={handleDonate}>donate</Button>
-                    </Options>
+                    </Options>)
                     : <div>
                         <p>none web3</p>
                     </div>

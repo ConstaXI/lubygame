@@ -1,0 +1,22 @@
+[
+    {
+        "question": "Qual foi o ano da queda definitiva do Império Romano Ocidental, também chamado de império Bizantino?",
+        "answers": ["569", "1453", "1500", "624"],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Qual foi a última dinastia a reinar no Império Romano do Ocidente?",
+        "answers": ["Flávios", "Severos", "Palaiologos", "Antoninos"],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Qual animal da fauna brasileira está retratado na nota de 10 reais?",
+        "answers": ["Jabuti", "Onça", "Arara", "Tucano"],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Quem pintou o teto da capela sistina?",
+        "answers": ["Donatello", "Rafael", "Leonardo da Vinci", "Michelangelo"],
+        "correctAnswer": 3
+    }
+]

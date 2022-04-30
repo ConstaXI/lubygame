@@ -30,6 +30,7 @@ export const ButtonContainer = styled.button`
     flex-direction: column;
     align-items: center;
 
+    margin-top: 48px;
     background: none;
     border: 0;
 

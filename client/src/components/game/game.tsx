@@ -6,6 +6,7 @@ import { OptionsContainer, Options } from '../menu/styles';
 import { Contract } from 'web3-eth-contract';
 import questions from "../../shared/questions.json"
 import { Amount } from '../../shared/Amount';
+import BN from "bn.js";
 
 interface IProps {
     instance: Contract
@@ -61,7 +62,11 @@ const Game = (props: IProps) => {
                 </ButtonContainer>
             </Options>
             <Amount>
-                LBC em jogo: {amount}
+              <p>Em jogo</p>
+              <strong>
+                {new BN(amount).div(new BN("1000000000000000000")).toString()}{" "}
+                LBC
+              </strong>
             </Amount>
         </OptionsContainer>
     )

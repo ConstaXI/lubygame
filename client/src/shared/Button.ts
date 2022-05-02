@@ -5,9 +5,10 @@ export const Button = styled.button`
     box-sizing: border-box;
     display: inline-block;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     width: 100%;
-    margin: 10px 0;
+    height: 56px;
+    margin: 8px 0;
     padding: 8px 16px;
     color: #eeeeee;
     border: 1px solid;
@@ -31,6 +32,7 @@ export const ButtonContainer = styled.button`
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    margin-top: 24px;
 
     background: none;
     border: 0;

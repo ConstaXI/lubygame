@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const Game = (props: IProps) => {
-    const [choice, setChoice] = useState(0)
+    const [choice, setChoice] = useState<number | null>(null)
     const [amount, setAmount] = useState("0")
     const [question, setQuestion] = useState<typeof questions[0]>(questions[Math.floor(Math.random() * questions.length)])
 
@@ -23,15 +23,15 @@ const Game = (props: IProps) => {
         instance.methods.getBalanceIndividual().call({ from: accounts[0] }).then((balance: string) => {
             setAmount(balance)
         })
-    }, [accounts, instance.methods])
+    }, [accounts, instance.methods, amount])
 
     const handleBet = async () => {
         if (choice === question.correctAnswer) {
             await instance.methods.correctAnswer("1000000000000000000").send({ from: accounts[0] })
+        } else {
+            await instance.methods.incorrectAnswer("1000000000000000000").send({ from: accounts[0] })
         }
-
-        await instance.methods.incorrectAnswer("1000000000000000000").send({ from: accounts[0] })
-
+    
         const balance = await instance.methods.getBalanceIndividual().call({ from: accounts[0] })
 
         const random = Math.floor(Math.random() * questions.length)
@@ -39,6 +39,7 @@ const Game = (props: IProps) => {
         setQuestion(questions[random])
 
         setAmount(balance)
+        setChoice(null)
     }
 
     const claimReward = async () => {
@@ -49,7 +50,7 @@ const Game = (props: IProps) => {
         <OptionsContainer>
             <Options>
                 <h2>{question.question}</h2>
-                <RadioGroup onChange={(e) => setChoice(Number(e.target.value))}>
+                <RadioGroup onChange={(e) => setChoice(Number(e.target.value))} value={choice}>
                     {question.answers.map((answer, index) => (
                         <FormControlLabel control={<Radio />} label={answer} value={index} />
                     ))}
@@ -60,7 +61,7 @@ const Game = (props: IProps) => {
                 </ButtonContainer>
             </Options>
             <Amount>
-                {amount}
+                LBC em jogo: {amount}
             </Amount>
         </OptionsContainer>
     )

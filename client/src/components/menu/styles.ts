@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import { TextField } from '@mui/material';
 
 export const Container = styled.div`
     height: 100%;
@@ -26,4 +27,21 @@ export const OptionsContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     max-width: 35vw;
+`
+
+export const StyledTextField = styled(TextField)`
+    > div::before{
+        border-bottom: 1px solid #eeeeee;
+    }
+    input {
+        color: #eeeeee;
+    }
+
+    label:focus {
+        color: yellow;
+    }
+
+    label {
+        color: #eeeeee;
+    }
 `

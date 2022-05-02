@@ -6,7 +6,8 @@ import useWeb3 from '../../hooks/web3';
 import { Amount } from '../../shared/Amount';
 import { Button, ButtonContainer } from '../../shared/Button';
 import Game from '../game/game';
-import { Container, Options, OptionsContainer } from './styles';
+import { Container, Options, OptionsContainer, StyledTextField } from './styles';
+import { createTheme, TextField } from '@mui/material';
 
 const Menu = () => {
     const { isLoading, isWeb3, web3, accounts } = useWeb3();
@@ -24,7 +25,7 @@ const Menu = () => {
                 deployedNetwork && deployedNetwork.address
             );
             setInstance(we3Instance);
-            
+
             we3Instance.methods.balanceOf(accounts[0]).call({ from: accounts[0] }).then((response: string) => {
                 setAmount(response)
             })
@@ -34,15 +35,17 @@ const Menu = () => {
     const handleDonate = async () => {
         await instance?.methods.mintLbc("1000000000000000000").send({ from: accounts[0] })
 
-        instance?.methods.balanceOf(accounts[0]).call({ from: accounts[0] }).then((response: string) => {
-            setAmount(response)
-        })
+        const balance = await instance?.methods.balanceOf(accounts[0]).call({ from: accounts[0] })
+
+        setAmount(balance)
     }
 
     const handleStart = async () => {
-        setGame(true)
+        await instance?.methods.approve("1000000000000000000").send({ from: accounts[0] })
 
         await instance?.methods.startGame("1000000000000000000").send({ from: accounts[0] })
+
+        setGame(true)
     }
 
     return (
@@ -56,15 +59,16 @@ const Menu = () => {
                         <Options>
                             <p>Bem vindo ao Luby Game. Assim que você clicar em "start" poderá começar as apostas</p>
                             <ButtonContainer>
+                                <StyledTextField id="filled-basic" label="Filled" variant="filled" fullWidth />
                                 <Button onClick={handleStart}>start</Button>
                                 <Button onClick={handleDonate}>donate</Button>
                             </ButtonContainer>
                         </Options>
                         <Amount>
-                            {amount}
+                            LBC em banco: {amount}
                         </Amount>
                     </OptionsContainer>
-                    )
+                )
                     : <div>
                         <p>none web3</p>
                     </div>

@@ -1,4 +1,3 @@
-import BN from "bn.js";
 import { useState, useEffect } from "react";
 import { Contract } from "web3-eth-contract";
 import { AbiItem } from "web3-utils";
@@ -17,9 +16,11 @@ import {
 const Menu = () => {
   const { isLoading, isWeb3, web3, accounts } = useWeb3();
   const [instance, setInstance] = useState<Contract>();
-  const [game, setGame] = useState(false);
-  const [amount, setAmount] = useState(new BN(0));
+  const [amount, setAmount] = useState("0");
   const [betValue, setBetValue] = useState("0");
+  const [gameStatus, setGameStatus] = useState(
+    localStorage.getItem("gameStatus") === "true"
+  );
 
   const abi = json.abi;
 
@@ -36,10 +37,10 @@ const Menu = () => {
         .balanceOf(accounts[0])
         .call({ from: accounts[0] })
         .then((response: string) => {
-          setAmount(new BN(response));
+          setAmount(response);
         });
     }
-  }, [abi, accounts, isLoading, isWeb3, web3, amount]);
+  }, [abi, accounts, isLoading, isWeb3, web3]);
 
   const handleDonate = async () => {
     await instance?.methods
@@ -50,21 +51,26 @@ const Menu = () => {
       .balanceOf(accounts[0])
       .call({ from: accounts[0] });
 
-    setAmount(new BN(balance));
+    setAmount(balance);
   };
 
   const handleStart = async () => {
-    if (!/^[0-9]+$/.test(betValue)) {
+    if (!betValue) {
       alert("O valor da aposta precisa ter apenas números.");
 
       return;
     }
 
-    await instance?.methods.approve(betValue).send({ from: accounts[0] });
+    await instance?.methods
+      .approve(betValue)
+      .send({ from: accounts[0] });
 
-    await instance?.methods.startGame(betValue).send({ from: accounts[0] });
+    await instance?.methods
+      .startGame(betValue)
+      .send({ from: accounts[0] });
 
-    setGame(true);
+    setGameStatus(true);
+    localStorage.setItem("gameStatus", "true");
   };
 
   return (
@@ -72,23 +78,21 @@ const Menu = () => {
       {isLoading ? (
         <div>Loading Web3, accounts, and contract...</div>
       ) : isWeb3 ? (
-        game ? (
-          <Game instance={instance as Contract} accounts={accounts} />
+        gameStatus ? (
+          <Game instance={instance} accounts={accounts} />
         ) : (
           <OptionsContainer>
             <h1>Luby Game</h1>
             <Options>
-              <p>
-                Clique em "start" para poder começar as apostas.
-              </p>
+              <p>Clique em "start" para poder começar as apostas.</p>
               <ButtonContainer>
                 <StyledTextField
-                id="filled-basic"
-                label="valor para aposta"
-                variant="outlined"
-                fullWidth
-                onChange={(e) => setBetValue(e.target.value)}
-                helperText="considere as 18 casas decimais"
+                  id="filled-basic"
+                  label="valor para aposta"
+                  variant="outlined"
+                  fullWidth
+                  onChange={(e) => setBetValue(e.target.value)}
+                  helperText="considere as 18 casas decimais"
                 />
                 <Button onClick={handleStart}>start</Button>
                 <Button onClick={handleDonate}>donate</Button>
@@ -97,8 +101,7 @@ const Menu = () => {
             <Amount>
               <p>Banco</p>
               <strong>
-                {new BN(amount).div(new BN("1000000000000000000")).toString()}{" "}
-                LBC
+                {amount} LBC
               </strong>
             </Amount>
           </OptionsContainer>

@@ -27,7 +27,7 @@ export const Button = styled.button`
     }
 `
 
-export const ButtonContainer = styled.button`
+export const ButtonContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;

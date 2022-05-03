@@ -19,6 +19,11 @@ const Game = (props: IProps) => {
   const [question, setQuestion] = useState<typeof questions[0]>(
     questions[Math.floor(Math.random() * questions.length)]
   );
+  const [bonus, setBonus] = useState(
+    new BN(localStorage.getItem("bonus") || "0")
+  );
+
+  const loss = new BN("2000000000000000000");
 
   const { instance, accounts } = props;
 
@@ -33,15 +38,37 @@ const Game = (props: IProps) => {
     }
   }, [accounts, instance]);
 
+  const returnToMenu = () => {
+    window.location.reload();
+
+    localStorage.setItem("gameStatus", "false");
+  };
+
   const handleBet = async () => {
     if (choice === question.correctAnswer) {
       await instance?.methods
         .correctAnswer("1000000000000000000")
         .send({ from: accounts[0] });
+
+      const newBonus = bonus.add(new BN("1000000000000000000"));
+
+      localStorage.setItem("bonus", newBonus.toString());
+      setBonus(newBonus);
     } else {
-      await instance?.methods
-        .incorrectAnswer("1000000000000000000")
-        .send({ from: accounts[0] });
+      if (amount.cmp(loss) < 1) {
+        await instance?.methods
+          .incorrectAnswer(amount)
+          .send({ from: accounts[0] });
+
+        returnToMenu();
+
+        return;
+      }
+
+      await instance?.methods.incorrectAnswer(loss).send({ from: accounts[0] });
+
+      localStorage.setItem("bonus", "0");
+      setBonus(new BN("0"));
     }
 
     const balance = await instance?.methods
@@ -55,14 +82,8 @@ const Game = (props: IProps) => {
     setChoice(null);
   };
 
-  const returnToMenu = () => {
-    window.location.reload();
-
-    localStorage.setItem("gameStatus", "false");
-  };
-
   const claimReward = async () => {
-    await instance?.methods.claimBalance(amount).send({ from: accounts[0] });
+    await instance?.methods.claimBalance(bonus).send({ from: accounts[0] });
 
     localStorage.setItem("gameStatus", "false");
 
@@ -89,13 +110,14 @@ const Game = (props: IProps) => {
         <ButtonContainer>
           <Button onClick={handleBet}>apostar</Button>
           <Button onClick={claimReward}>resgatar recompensa</Button>
-          <Button onClick={returnToMenu}>voltar</Button>
         </ButtonContainer>
       </Options>
       <Amount>
         <p>Em jogo</p>
         <strong>
-            {amount.div(new BN("1000000000000000000")).toString()} LBC
+          {amount.div(new BN("1000000000000000000")).toString()} LBC
+          <br />+ {bonus.div(new BN("1000000000000000000")).toString()} LBC
+          bonus
         </strong>
       </Amount>
     </OptionsContainer>

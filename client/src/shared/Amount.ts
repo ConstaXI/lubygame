@@ -6,14 +6,13 @@ export const Amount = styled.strong`
     justify-content: center;
     background: #424242;
     border-radius: 4px;
-    margin: 16px 0;
-    height: 10rem;
-    width: 100%;
+    margin-top: 16px;
+    padding: 24px 48px;
     
     text-align: center;
 
     strong {
-        font-size: 3rem;
+        font-size: 2.4rem;
         width: 100%;
     }
 

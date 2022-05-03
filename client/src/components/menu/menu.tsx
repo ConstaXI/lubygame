@@ -7,6 +7,7 @@ import useWeb3 from "../../hooks/web3";
 import { Amount } from "../../shared/Amount";
 import { Button, ButtonContainer } from "../../shared/Button";
 import Game from "../game/game";
+import WithDraw from '../owner/withdraw';
 import {
   Container,
   Options,
@@ -22,26 +23,32 @@ const Menu = () => {
   const [gameStatus, setGameStatus] = useState(
     localStorage.getItem("gameStatus") === "true"
   );
+  const [isOwner, setIsOwner] = useState(false);
 
   const abi = json.abi;
+  const deployedNetwork = json.networks["5777"];
 
   useEffect(() => {
-    if (web3 !== null) {
-      const deployedNetwork = json.networks["5777"];
-      const we3Instance = new web3.eth.Contract(
-        abi as AbiItem[],
-        deployedNetwork && deployedNetwork.address
-      );
-      setInstance(we3Instance);
+    (async () => {
+      if (web3 !== null) {
+        const we3Instance = new web3.eth.Contract(
+          abi as AbiItem[],
+          deployedNetwork && deployedNetwork.address
+        );
+        setInstance(we3Instance);
 
-      we3Instance.methods
-        .balanceOf(accounts[0])
-        .call({ from: accounts[0] })
-        .then((response: string) => {
-          setAmount(new BN(response));
-        });
-    }
-  }, [abi, accounts, isLoading, isWeb3, web3]);
+        const [amount, owner] = await Promise.all([
+          we3Instance.methods
+            .balanceOf(accounts[0])
+            .call({ from: accounts[0] }),
+          we3Instance.methods.owner().call({ from: accounts[0] }),
+        ]);
+
+        setIsOwner(owner === accounts[0]);
+        setAmount(new BN(amount));
+      }
+    })();
+  }, [abi, accounts, deployedNetwork, isLoading, isWeb3, web3]);
 
   const handleDonate = async () => {
     await instance?.methods
@@ -56,6 +63,12 @@ const Menu = () => {
   };
 
   const handleStart = async () => {
+    if (localStorage.getItem("gameStatus") === "true") {
+      setGameStatus(true);
+
+      return;
+    }
+
     if (!betValue) {
       alert("O valor da aposta precisa ter apenas números.");
 
@@ -63,9 +76,9 @@ const Menu = () => {
     }
 
     if (betValue.cmp(amount) > 1) {
-        alert("Você não tem LBC suficiente");
+      alert("Você não tem LBC suficiente");
 
-        return;
+      return;
     }
 
     await instance?.methods
@@ -79,6 +92,7 @@ const Menu = () => {
     setGameStatus(true);
     localStorage.setItem("gameStatus", "true");
   };
+
 
   return (
     <Container>
@@ -99,7 +113,7 @@ const Menu = () => {
                   variant="outlined"
                   fullWidth
                   onChange={(e) => setBetValue(new BN(e.target.value))}
-                  helperText="considere as 18 casas decimais"
+                  helperText="não considere as 18 casas decimais"
                 />
                 <Button onClick={handleStart}>start</Button>
                 <Button onClick={handleDonate}>donate</Button>
@@ -111,6 +125,9 @@ const Menu = () => {
                 {amount.div(new BN("1000000000000000000")).toString()} LBC
               </strong>
             </Amount>
+            {isOwner && (
+              <WithDraw instance={instance} accounts={accounts} contractAddress={deployedNetwork.address} />
+            )}
           </OptionsContainer>
         )
       ) : (

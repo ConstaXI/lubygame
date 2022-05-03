@@ -8,40 +8,49 @@ import { Amount } from "../../shared/Amount";
 import { Contract } from "web3-eth-contract";
 import BN from "bn.js";
 
-interface IProps {
+type Props = {
   instance?: Contract;
   accounts: string[];
-}
+};
 
-const Game = (props: IProps) => {
+type Question = typeof questions[0];
+
+const Game = (props: Props) => {
+  const { instance, accounts } = props;
+
   const [choice, setChoice] = useState<number | null>(null);
   const [amount, setAmount] = useState(new BN("0"));
-  const [question, setQuestion] = useState<typeof questions[0]>(
-    questions[Math.floor(Math.random() * questions.length)]
-  );
+  const [question, setQuestion] = useState<typeof questions[0]>({} as Question);
   const [bonus, setBonus] = useState(
-    new BN(localStorage.getItem("bonus") || "0")
+    new BN(localStorage.getItem(`${accounts[0]}_bonus`) || "0")
   );
 
   const loss = new BN("2000000000000000000");
 
-  const { instance, accounts } = props;
-
   useEffect(() => {
-    if (instance) {
-      instance.methods
-        .getBalanceIndividual()
-        .call({ from: accounts[0] })
-        .then((response: string) => {
-          setAmount(new BN(response));
-        });
-    }
+    (async () => {
+      if (instance) {
+        const balance = await instance.methods
+          .getBalanceIndividual()
+          .call({ from: accounts[0] });
+
+        if (balance === "0") {
+          returnToMenu();
+        }
+
+        setAmount(new BN(balance));
+      }
+    })();
   }, [accounts, instance]);
 
-  const returnToMenu = () => {
-    window.location.reload();
+  useEffect(() => {
+    setQuestion(questions.pop() as Question);
+  }, []);
 
+  const returnToMenu = () => {
     localStorage.setItem("gameStatus", "false");
+
+    window.location.reload();
   };
 
   const handleBet = async () => {
@@ -52,7 +61,7 @@ const Game = (props: IProps) => {
 
       const newBonus = bonus.add(new BN("1000000000000000000"));
 
-      localStorage.setItem("bonus", newBonus.toString());
+      localStorage.setItem(`${accounts[0]}_bonus`, newBonus.toString());
       setBonus(newBonus);
     } else {
       if (amount.cmp(loss) < 1) {
@@ -67,7 +76,7 @@ const Game = (props: IProps) => {
 
       await instance?.methods.incorrectAnswer(loss).send({ from: accounts[0] });
 
-      localStorage.setItem("bonus", "0");
+      localStorage.setItem(`${accounts[0]}_bonus`, "0");
       setBonus(new BN("0"));
     }
 
@@ -75,9 +84,7 @@ const Game = (props: IProps) => {
       .getBalanceIndividual()
       .call({ from: accounts[0] });
 
-    const random = Math.floor(Math.random() * questions.length);
-
-    setQuestion(questions[random]);
+    setQuestion(questions.pop() as Question);
     setAmount(new BN(balance));
     setChoice(null);
   };
@@ -85,9 +92,7 @@ const Game = (props: IProps) => {
   const claimReward = async () => {
     await instance?.methods.claimBalance(bonus).send({ from: accounts[0] });
 
-    localStorage.setItem("gameStatus", "false");
-
-    window.location.reload();
+    returnToMenu();
   };
 
   return (
@@ -98,7 +103,7 @@ const Game = (props: IProps) => {
           onChange={(e) => setChoice(Number(e.target.value))}
           value={choice}
         >
-          {question.answers.map((answer, index) => (
+          {question.answers?.map((answer, index) => (
             <FormControlLabel
               key={`answer${index}`}
               control={<Radio />}

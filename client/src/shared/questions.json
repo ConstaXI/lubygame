@@ -1,6 +1,6 @@
 [
     {
-        "question": "Qual foi o ano da queda definitiva do Império Romano Ocidental, também chamado de império Bizantino?",
+        "question": "Qual foi o ano da queda definitiva do Império Romano do Ocidente, também chamado de império Bizantino?",
         "answers": ["569", "1453", "1500", "624"],
         "correctAnswer": 1
     },
@@ -17,6 +17,21 @@
     {
         "question": "Quem pintou o teto da capela sistina?",
         "answers": ["Donatello", "Rafael", "Leonardo da Vinci", "Michelangelo"],
+        "correctAnswer": 3
+    },
+    {
+        "question": "Quantos anos durou a Guerra dos 100 Anos?",
+        "answers": ["116", "100", "96", "104"],
+        "correctAnswer": 0
+    },
+    {
+        "question": "Qual desses títulos da nobreza tem maior hierarquia?",
+        "answers": ["Duque", "Marquês", "Conde", "Barão"],
+        "correctAnswer": 0
+    },
+    {
+        "question": "Qual desses dois reinos participou dos dois lados da Guerra dos 100 anos?",
+        "answers": ["Borgonha e Castela", " Bretanha e Aragão", "Borgonha e Aragão", "Borgonha e Bretanha"],
         "correctAnswer": 3
     }
 ]

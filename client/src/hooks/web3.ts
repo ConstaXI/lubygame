@@ -18,10 +18,10 @@ const Hooks = (): state => {
   });
 
   useEffect(() => {
-    (async(): Promise<void> => {
+    (async () => {
       try {
         const web3: Web3 = await getWeb3();
-        const accounts = await web3.eth.requestAccounts();
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setState({
           ...state,
           isLoading: false,

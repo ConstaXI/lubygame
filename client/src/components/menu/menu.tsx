@@ -40,11 +40,11 @@ const Menu = () => {
         const [amount, owner] = await Promise.all([
           we3Instance.methods
             .balanceOf(accounts[0])
-            .call({ from: accounts[0] }),
-          we3Instance.methods.owner().call({ from: accounts[0] }),
+            .call({ from: accounts[0] }) as string,
+          we3Instance.methods.owner().call({ from: accounts[0] }) as string,
         ]);
 
-        setIsOwner(owner === accounts[0]);
+        setIsOwner(owner.toLowerCase() === accounts[0].toLowerCase());
         setAmount(new BN(amount));
       }
     })();
@@ -75,7 +75,7 @@ const Menu = () => {
       return;
     }
 
-    if (betValue.cmp(amount) > 1) {
+    if (betValue.cmp(amount) > 0) {
       alert("Você não tem LBC suficiente");
 
       return;

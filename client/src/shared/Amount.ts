@@ -13,7 +13,7 @@ export const Amount = styled.strong`
     text-align: center;
 
     strong {
-        font-size: 1.6rem;
+        font-size: 3rem;
         width: 100%;
     }
 

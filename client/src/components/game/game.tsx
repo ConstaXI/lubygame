@@ -6,6 +6,7 @@ import { OptionsContainer, Options } from "../menu/styles";
 import questions from "../../shared/questions.json";
 import { Amount } from "../../shared/Amount";
 import { Contract } from "web3-eth-contract";
+import BN from "bn.js";
 
 interface IProps {
   instance?: Contract;
@@ -14,7 +15,7 @@ interface IProps {
 
 const Game = (props: IProps) => {
   const [choice, setChoice] = useState<number | null>(null);
-  const [amount, setAmount] = useState("0");
+  const [amount, setAmount] = useState(new BN("0"));
   const [question, setQuestion] = useState<typeof questions[0]>(
     questions[Math.floor(Math.random() * questions.length)]
   );
@@ -27,7 +28,7 @@ const Game = (props: IProps) => {
         .getBalanceIndividual()
         .call({ from: accounts[0] })
         .then((response: string) => {
-          setAmount(response);
+          setAmount(new BN(response));
         });
     }
   }, [accounts, instance]);
@@ -50,7 +51,7 @@ const Game = (props: IProps) => {
     const random = Math.floor(Math.random() * questions.length);
 
     setQuestion(questions[random]);
-    setAmount(balance);
+    setAmount(new BN(balance));
     setChoice(null);
   };
 
@@ -61,8 +62,6 @@ const Game = (props: IProps) => {
   };
 
   const claimReward = async () => {
-    await instance?.methods.approve(amount).send({ from: accounts[0] });
-
     await instance?.methods.claimBalance(amount).send({ from: accounts[0] });
 
     localStorage.setItem("gameStatus", "false");
@@ -96,7 +95,7 @@ const Game = (props: IProps) => {
       <Amount>
         <p>Em jogo</p>
         <strong>
-          {amount} LBC
+            {amount.div(new BN("1000000000000000000")).toString()} LBC
         </strong>
       </Amount>
     </OptionsContainer>

@@ -1,3 +1,4 @@
+import BN from "bn.js";
 import { useState, useEffect } from "react";
 import { Contract } from "web3-eth-contract";
 import { AbiItem } from "web3-utils";
@@ -16,8 +17,8 @@ import {
 const Menu = () => {
   const { isLoading, isWeb3, web3, accounts } = useWeb3();
   const [instance, setInstance] = useState<Contract>();
-  const [amount, setAmount] = useState("0");
-  const [betValue, setBetValue] = useState("0");
+  const [amount, setAmount] = useState(new BN("0"));
+  const [betValue, setBetValue] = useState(new BN("0"));
   const [gameStatus, setGameStatus] = useState(
     localStorage.getItem("gameStatus") === "true"
   );
@@ -37,7 +38,7 @@ const Menu = () => {
         .balanceOf(accounts[0])
         .call({ from: accounts[0] })
         .then((response: string) => {
-          setAmount(response);
+          setAmount(new BN(response));
         });
     }
   }, [abi, accounts, isLoading, isWeb3, web3]);
@@ -51,7 +52,7 @@ const Menu = () => {
       .balanceOf(accounts[0])
       .call({ from: accounts[0] });
 
-    setAmount(balance);
+    setAmount(new BN(balance));
   };
 
   const handleStart = async () => {
@@ -61,12 +62,18 @@ const Menu = () => {
       return;
     }
 
+    if (betValue.cmp(amount) > 1) {
+        alert("Você não tem LBC suficiente");
+
+        return;
+    }
+
     await instance?.methods
-      .approve(betValue)
+      .approve(betValue.mul(new BN("1000000000000000000")))
       .send({ from: accounts[0] });
 
     await instance?.methods
-      .startGame(betValue)
+      .startGame(betValue.mul(new BN("1000000000000000000")))
       .send({ from: accounts[0] });
 
     setGameStatus(true);
@@ -91,7 +98,7 @@ const Menu = () => {
                   label="valor para aposta"
                   variant="outlined"
                   fullWidth
-                  onChange={(e) => setBetValue(e.target.value)}
+                  onChange={(e) => setBetValue(new BN(e.target.value))}
                   helperText="considere as 18 casas decimais"
                 />
                 <Button onClick={handleStart}>start</Button>
@@ -101,7 +108,7 @@ const Menu = () => {
             <Amount>
               <p>Banco</p>
               <strong>
-                {amount} LBC
+                {amount.div(new BN("1000000000000000000")).toString()} LBC
               </strong>
             </Amount>
           </OptionsContainer>
